@@ -1,0 +1,6 @@
+[submodule "sign-validation"]
+	path = sign-validation
+	url = ../sign-validation.git
+[submodule "GUI-sign"]
+	path = GUI-sign
+	url = ../GUI-sign.git
