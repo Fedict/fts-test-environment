@@ -2,6 +2,17 @@
 
 set -e
 
+PFW=""
+cleanup() {
+	if [ ! -z "$PFW" ]; then
+		kill -TERM $PFW
+		sleep 1
+		kill -KILL $PFW
+	fi
+}
+
+trap cleanup EXIT
+
 status() {
 	text="$1"
 	equals="============================================================================================================="
@@ -35,11 +46,24 @@ stty $stty_orig
 echo ""
 oc create secret docker-registry bosa-registry --docker-server=registry-fsf.services.belgium.be:5000 --docker-username="$user" --docker-password="$pass" --docker-email="$user"@zetes.com
 oc secrets link default bosa-registry --for=pull
+sleep 1
 status "Loading images..."
 oc create -f configmaps.yaml
 oc create -f postgres.yaml
-oc process -f sign-validation/bosadt-openshift-project.yaml | oc create -f -
-oc process -f GUI-sign/bosadt-openshift-project.yaml | oc create -f -
+while [ $(( $(oc get -o json statefulset/postgresql | jq .status.readyReplicas) + 0 )) -lt 1 ]
+do
+	echo "PostgreSQL container not ready yet. Waiting..."
+	sleep 10
+done
+oc port-forward svc/postgresql 7000:5432 &
+PFW=$!
+sleep 1
+export PGPASSWORD=7l8XNiA3
+grep -Ev "(^#|^CREATE DATABASE|^.connect)" sign-validation/signingconfigurator/scripts/01-create-tables.sql | psql -h localhost -U testuser -p 7000 bosa_fts_ta
+kill -TERM $PFW
+PFW=""
+oc process -f sign-validation/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}},{"configMapRef": {"name": "signvalidationsettings"}}]|.items[2].spec.host="validate.in.testing"|.items[3].spec.host="sign.in.testing"'| oc create -f -
+oc process -f GUI-sign/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}}]|.items[2].spec.host="sign.in.testing"'| oc create -f -
 status "Done; the project should now be loading into your openshift."
 echo "To access the services, edit /etc/hosts to point the hostname you"
 echo "wish to access to" $(minishift ip)
