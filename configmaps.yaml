@@ -16,7 +16,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  PROXY_HOST: dc-proxy.names.belgium.be
+  PROXY_HOST: squid
   PROXY_NONPROXYHOST: localhost
   PROXY_PORT: '3128'
 kind: ConfigMap
