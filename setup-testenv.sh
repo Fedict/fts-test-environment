@@ -44,6 +44,11 @@ minishift start
 status "Creating project..."
 eval $(minishift oc-env)
 oc login -u system -p admin
+if [ "$(oc get -o json project bosa-trust-services | jq '.status.phase')" = '"Active"' ]; then
+	status "bosa-trust-services project found. Deleting..."
+	oc delete project bosa-trust-services
+	sleep 60
+fi
 oc new-project --display-name="BOSA Trust Services" bosa-trust-services
 status "Setting up pull credentials..."
 echo "Please enter your credentials for https://git-fsf.services.belgium.be/"
