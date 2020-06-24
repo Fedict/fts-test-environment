@@ -2,7 +2,7 @@ FROM debian:stable
 RUN apt-get update \
 	&& apt-get -y install squid \
 	&& mkdir -p /var/log/squid \
-	&& chmod -R 755 /var/log/squid \
+	&& chmod -R 777 /var/log/squid \
 	&& chown -R proxy:proxy /var/log/squid \
 	&& mkdir -p /var/spool/squid \
 	&& chown -R proxy:proxy /var/spool/squid \
