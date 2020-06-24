@@ -59,7 +59,7 @@ oc port-forward svc/postgresql 7000:5432 &
 PFW=$!
 sleep 1
 export PGPASSWORD=7l8XNiA3
-grep -Ev "(^#|^CREATE DATABASE|^.connect)" sign-validation/signingconfigurator/scripts/01-create-tables.sql | psql -h localhost -U testuser -p 7000 bosa_fts_ta
+(grep -Ev "(^#|^CREATE DATABASE|^.connect)" sign-validation/signingconfigurator/scripts/01-create-tables.sql; cat insert-profiles.sql) | psql -h localhost -U testuser -p 7000 bosa_fts_ta
 kill -TERM $PFW
 PFW=""
 oc process -f sign-validation/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}},{"configMapRef": {"name": "signvalidationsettings"}}]|.items[2].spec.host="validate.in.testing"|.items[3].spec.host="sign.in.testing"'| oc create -f -
