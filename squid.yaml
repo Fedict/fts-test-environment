@@ -31,7 +31,7 @@ objects:
           deploymentconfig: squid
       spec:
         containers:
-        - image: sameersbn/squid
+        - image: registry-fsf.services.belgium.be:5000/eidas/test-environment/squid:latest
           imagePullPolicy: Always
           name: squid
           port: 3128

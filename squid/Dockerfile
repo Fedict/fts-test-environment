@@ -1,0 +1,13 @@
+FROM debian:stable
+RUN apt-get update \
+	&& apt-get -y install squid \
+	&& mkdir -p /var/log/squid \
+	&& chmod -R 755 /var/log/squid \
+	&& chown -R proxy:proxy /var/log/squid \
+	&& mkdir -p /var/spool/squid \
+	&& chown -R proxy:proxy /var/spool/squid \
+	&& chmod go+w /var/run
+EXPOSE 3128/tcp
+COPY ./entrypoint /usr/local/sbin/
+ENTRYPOINT /usr/local/sbin/entrypoint
+USER proxy
