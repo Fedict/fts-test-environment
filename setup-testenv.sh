@@ -81,8 +81,8 @@ PFW=""
 oc process -f sign-validation/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}},{"configMapRef": {"name": "signvalidationsettings"}},{"configMapRef":{"name":"httpproxysettings"}}]|.items[2].spec.host="validate.in.testing"|.items[2].spec.tls = {"insecureEdgeTerminationPolicy": "Redirect","termination":"edge"}|.items[2].spec.wildcardPolicy="None"'| oc create -f -
 oc process -f GUI-sign/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}},{"configMapRef":{"name":"httpproxysettings"}}]|.items[2].spec.host="sign.in.testing"|.items[2].spec.tls={"insecureEdgeTerminationPolicy":"Redirect","termination":"edge"}|.items[2].spec.wildcardPolicy="None"'| oc create -f -
 status "Done; the project should now be loading into your openshift."
-echo "To access the services, edit /etc/hosts to point the hostname you"
-echo "wish to access to" $(minishift ip)
+echo "To access the services, edit /etc/hosts to point sign.in.testing and"
+echo "validate.in.testing to" $(minishift ip)
 echo "To move on:"
 echo "  * 'minishift console' opens the OpenShift console in your default browser"
 echo "    (log on with user name 'system' and password 'admin')"
