@@ -78,8 +78,8 @@ export PGPASSWORD=7l8XNiA3
 (grep -Ev "(^#|^CREATE DATABASE|^.connect)" sign-validation/signingconfigurator/scripts/01-create-tables.sql; cat insert-profiles.sql) | psql -h localhost -U testuser -p 7000 bosa_fts_ta
 kill -TERM $PFW
 PFW=""
-oc process -f sign-validation/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}},{"configMapRef": {"name": "signvalidationsettings"}},{"configMapRef":{"name":"httpproxysettings"}}]|.items[2].spec.host="validate.in.testing"'| oc create -f -
-oc process -f GUI-sign/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}},{"configMapRef":{"name":"httpproxysettings"}}]|.items[2].spec.host="sign.in.testing"'| oc create -f -
+oc process -f sign-validation/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}},{"configMapRef": {"name": "signvalidationsettings"}},{"configMapRef":{"name":"httpproxysettings"}}]|.items[2].spec.host="validate.in.testing"|.items[2].spec.tls = {"insecureEdgeTerminationPolicy": "Redirect","termination":"edge"}|.items[2].spec.wildcardPolicy="None"'| oc create -f -
+oc process -f GUI-sign/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}},{"configMapRef":{"name":"httpproxysettings"}}]|.items[2].spec.host="sign.in.testing"|.items[2].spec.tls={"insecureEdgeTerminationPolicy":"Redirect","termination":"edge"}|.items[2].spec.wildcardPolicy="None"'| oc create -f -
 status "Done; the project should now be loading into your openshift."
 echo "To access the services, edit /etc/hosts to point the hostname you"
 echo "wish to access to" $(minishift ip)
