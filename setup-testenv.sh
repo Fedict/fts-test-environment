@@ -21,6 +21,21 @@ status() {
 	printf "%s\n! %s !\n%s\n" ${equals:0:$len} "$text" ${equals:0:$len}
 }
 
+require_cmd() {
+	cmd="$1"
+	if type $cmd >/dev/null 2>/dev/null; then
+		:
+	else
+		echo "E: required command not found: $cmd. Please install it, then try again."
+		exit 1
+	fi
+}
+
+require_cmd jq
+require_cmd minishift
+require_cmd psql
+require_cmd stty
+
 status "Pulling submodules..."
 git submodule init
 git submodule update
@@ -62,7 +77,7 @@ export PGPASSWORD=7l8XNiA3
 (grep -Ev "(^#|^CREATE DATABASE|^.connect)" sign-validation/signingconfigurator/scripts/01-create-tables.sql; cat insert-profiles.sql) | psql -h localhost -U testuser -p 7000 bosa_fts_ta
 kill -TERM $PFW
 PFW=""
-oc process -f sign-validation/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}},{"configMapRef": {"name": "signvalidationsettings"}}]|.items[2].spec.host="validate.in.testing"|.items[3].spec.host="sign.in.testing"'| oc create -f -
+oc process -f sign-validation/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}},{"configMapRef": {"name": "signvalidationsettings"}}]|.items[2].spec.host="validate.in.testing"'| oc create -f -
 oc process -f GUI-sign/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}}]|.items[2].spec.host="sign.in.testing"'| oc create -f -
 status "Done; the project should now be loading into your openshift."
 echo "To access the services, edit /etc/hosts to point the hostname you"
