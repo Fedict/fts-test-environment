@@ -2,11 +2,11 @@
 apiVersion: v1
 data:
   RESOURCES_PW: 7l8XNiA3
-  RESOURCES_SCHEMA: schema_resources_adm
+  RESOURCES_SCHEMA: signing
   RESOURCES_URL: 'jdbc:postgresql://postgresql:5432/bosa_fts_ta'
   RESOURCES_USER: testuser
   SIGNING_PW: 7l8XNiA3
-  SIGNING_SCHEMA: schema_signing_adm
+  SIGNING_SCHEMA: signing
   SIGNING_URL: 'jdbc:postgresql://postgresql:5432/bosa_fts_ta'
   SIGNING_USER: testuser
 kind: ConfigMap
