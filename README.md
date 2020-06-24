@@ -6,6 +6,8 @@ all the containers for the BOSA trust services.
 HOWTO:
 
 - Install [minishift](https://github.com/minishift/minishift)
+- Make sure that `jq`, `psql`, and `stty` are available (Debian/Ubuntu: `sudo
+  apt install jq postgresql-client coreutils`)
 - configure minishift's virtualization for your platform as explained in
   their [Getting Started
 guide](https://docs.okd.io/3.11/minishift/getting-started/index.html)
@@ -28,6 +30,6 @@ To access the database, do:
     oc port-forward svc/postgresql 7000:5432
 
 then run `psql -h localhost -p 7000 -U testuser -W` (you can find the
-password in [postgresql.yaml](postgresql.yaml)
+password in [postgresql.yaml](postgresql.yaml) )
 
 For more questions, talk to Wouter.
