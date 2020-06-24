@@ -73,7 +73,7 @@ do
 done
 oc port-forward svc/postgresql 7000:5432 &
 PFW=$!
-sleep 1
+sleep 10
 export PGPASSWORD=7l8XNiA3
 (grep -Ev "(^#|^CREATE DATABASE|^.connect)" sign-validation/signingconfigurator/scripts/01-create-tables.sql; cat insert-profiles.sql) | psql -h localhost -U testuser -p 7000 bosa_fts_ta
 kill -TERM $PFW
