@@ -69,6 +69,10 @@ oc secrets link default bosa-registry --for=pull
 sleep 1
 status "Loading images..."
 oc create -f configmaps.yaml
+rm -rf gui-config
+cp -a GUI-sign/public/config gui-config
+sed -i -e 's,ta.fts.bosa.belgium.be,in.testing,g' gui-config/config.js
+oc create configmap gui-config --from-file=gui-config
 oc create -f postgres.yaml
 oc process -f squid.yaml | oc create -f -
 while [ $(( $(oc get -o json statefulset/postgresql | jq .status.readyReplicas) + 0 )) -lt 1 ]
@@ -84,7 +88,7 @@ export PGPASSWORD=7l8XNiA3
 kill -TERM $PFW
 PFW=""
 oc process -f sign-validation/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}},{"configMapRef": {"name": "signvalidationsettings"}},{"configMapRef":{"name":"httpproxysettings"}}]|.items[2].spec.host="validate.in.testing"|.items[2].spec.tls = {"insecureEdgeTerminationPolicy": "Redirect","termination":"edge"}|.items[2].spec.wildcardPolicy="None"'| oc create -f -
-oc process -f GUI-sign/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}},{"configMapRef":{"name":"httpproxysettings"}}]|.items[2].spec.host="sign.in.testing"|.items[2].spec.tls={"insecureEdgeTerminationPolicy":"Redirect","termination":"edge"}|.items[2].spec.wildcardPolicy="None"'| oc create -f -
+oc process -f GUI-sign/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}},{"configMapRef":{"name":"httpproxysettings"}}]|.items[2].spec.host="sign.in.testing"|.items[2].spec.tls={"insecureEdgeTerminationPolicy":"Redirect","termination":"edge"}|.items[2].spec.wildcardPolicy="None"|.items[0].spec.template.spec.containers[0].volumeMounts=[{"name":"config-volume","mountPath":"/app/build/config"}]|.items[0].spec.template.spec.volumes = [{"name":"config-volume","configMap":{"name":"gui-config"}}]|.items[0].spec.template.spec.containers[0].command=["serve"]|.items[0].spec.template.spec.containers[0].args=["-s","-S","build"]'| oc create -f -
 status "Done; the project should now be loading into your openshift."
 echo "To access the services, edit /etc/hosts to point sign.in.testing and"
 echo "validate.in.testing to" $(minishift ip)
