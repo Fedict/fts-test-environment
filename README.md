@@ -32,4 +32,15 @@ To access the database, do:
 then run `psql -h localhost -p 7000 -U testuser -W` (you can find the
 password in [postgresql.yaml](postgresql.yaml) )
 
+To get a shell on any container, do:
+
+    oc get pods
+
+to see a list of the available pods; then
+
+    oc rsh pod/<pod name>
+
+to get a shell on the first container inside that pod (currently all
+pods only have one container)
+
 For more questions, talk to Wouter.
