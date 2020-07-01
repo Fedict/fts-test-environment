@@ -17,7 +17,7 @@ status() {
 	text="$1"
 	equals="============================================================================================================="
 	shift
-	len=$(( $(printf %s $text|wc -c) + 5 ))
+	len=$(( $(printf %s "$text"|wc -c) + 4 ))
 	printf "%s\n! %s !\n%s\n" ${equals:0:$len} "$text" ${equals:0:$len}
 }
 
