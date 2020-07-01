@@ -6,8 +6,8 @@ all the containers for the BOSA trust services.
 HOWTO:
 
 - Install [minishift](https://github.com/minishift/minishift)
-- Make sure that `jq`, `psql`, and `stty` are available (Debian/Ubuntu: `sudo
-  apt install jq postgresql-client coreutils`)
+- Make sure that `base64`, `jq`, `psql`, and `stty` are available
+  (Debian/Ubuntu: `sudo apt install jq postgresql-client coreutils`)
 - configure minishift's virtualization for your platform as explained in
   their [Getting Started
 guide](https://docs.okd.io/3.11/minishift/getting-started/index.html)

@@ -35,6 +35,7 @@ require_cmd jq
 require_cmd minishift
 require_cmd psql
 require_cmd stty
+require_cmd base64
 
 status "Pulling submodules..."
 git submodule init
