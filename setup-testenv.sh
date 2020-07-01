@@ -45,7 +45,12 @@ status "Creating project..."
 eval $(minishift oc-env)
 oc login -u system -p admin
 if [ "$(oc get -o json project bosa-trust-services 2>/dev/null | jq '.status.phase')" = '"Active"' ]; then
-	status "old bosa-trust-services project found. Deleting..."
+	status "old bosa-trust-services project found. Exporting credentials & deleting..."
+	json=$(oc get -o json secret/bosa-registry)
+	if [ ! -z "$json" ]; then
+		user=$(echo $json|jq -r '.data[".dockerconfigjson"]'|base64 -d|jq -r '.auths["registry-fsf.services.belgium.be:5000"]["username"]')
+		pass=$(echo $json|jq -r '.data[".dockerconfigjson"]'|base64 -d|jq -r '.auths["registry-fsf.services.belgium.be:5000"]["password"]')
+	fi
 	oc delete project bosa-trust-services
 	sleep 60
 fi
@@ -56,14 +61,18 @@ echo "Note that these will be stored inside the OpenShift environment. For secur
 echo "reasons, you should therefore create an access token with the 'read_registry'"
 echo "scope (and nothing else) at"
 echo "https://git-fsf.services.belgium.be/profile/personal_access_tokens"
-printf %s "Username: "
-read user
-stty_orig=$(stty -g)
-stty -echo
-printf %s "Access token: "
-read pass
-stty $stty_orig
-echo ""
+if [ -z "$user" ]; then
+	printf %s "Username: "
+	read user
+fi
+if [ -z "$pass" ]; then
+	stty_orig=$(stty -g)
+	stty -echo
+	printf %s "Access token: "
+	read pass
+	stty $stty_orig
+	echo ""
+fi
 oc create secret docker-registry bosa-registry --docker-server=registry-fsf.services.belgium.be:5000 --docker-username="$user" --docker-password="$pass" --docker-email="$user"@zetes.com
 oc secrets link default bosa-registry --for=pull
 sleep 1
