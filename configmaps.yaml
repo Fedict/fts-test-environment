@@ -31,3 +31,17 @@ data:
 kind: ConfigMap
 metadata:
   name: signvalidationsettings
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: idpconfig
+data:
+  SIGNING_URL: "https://idp.in.testing"
+  HSM_MODULE: "/usr/lib/softhsm/libsofthsm2.so"
+  HSM_USER_PIN: "12345"
+  HSM_KEY_ID: "test_IdP"
+  HSM_SLOT: "0"
+  IDP_URL: "https://fas.url"
+  FAS_CERTIFICATE_FILENAME: "/etc/config/fas.pem"
+  FAS_CLIENT_ID: "IAMFAS"

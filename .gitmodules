@@ -4,3 +4,6 @@
 [submodule "GUI-sign"]
 	path = GUI-sign
 	url = ../GUI-sign.git
+[submodule "IDP"]
+	path = IDP
+	url = ../IDP.git
