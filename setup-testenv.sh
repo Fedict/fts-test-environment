@@ -56,7 +56,7 @@ if [ "$(oc get -o json project bosa-trust-services 2>/dev/null | jq '.status.pha
 	sleep 60
 fi
 oc new-project --display-name="BOSA Trust Services" bosa-trust-services
-status "Setting up pull credentials..."
+status "Setting up secrets..."
 echo "Please enter your credentials for https://git-fsf.services.belgium.be/"
 echo "Note that these will be stored inside the OpenShift environment. For security"
 echo "reasons, you should therefore create an access token with the 'read_registry'"
@@ -76,6 +76,7 @@ if [ -z "$pass" ]; then
 fi
 oc create secret docker-registry bosa-registry --docker-server=registry-fsf.services.belgium.be:5000 --docker-username="$user" --docker-password="$pass" --docker-email="$user"@zetes.com
 oc secrets link default bosa-registry --for=pull
+oc create secret softhsm-tokens --from-file=softhsm-tokens.tgz
 sleep 1
 status "Loading images..."
 oc create -f configmaps.yaml
