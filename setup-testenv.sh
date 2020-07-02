@@ -76,7 +76,7 @@ if [ -z "$pass" ]; then
 fi
 oc create secret docker-registry bosa-registry --docker-server=registry-fsf.services.belgium.be:5000 --docker-username="$user" --docker-password="$pass" --docker-email="$user"@zetes.com
 oc secrets link default bosa-registry --for=pull
-oc create secret softhsm-tokens --from-file=softhsm-tokens.tgz
+oc create secret generic softhsm-tokens --from-file=softhsm-tokens.tgz
 sleep 1
 status "Loading images..."
 oc create -f configmaps.yaml
