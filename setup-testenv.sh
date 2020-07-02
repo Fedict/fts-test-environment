@@ -98,9 +98,9 @@ export PGPASSWORD=7l8XNiA3
 (grep -Ev "(^#|^CREATE DATABASE|^.connect)" sign-validation/signingconfigurator/scripts/01-create-tables.sql; cat insert-profiles.sql) | psql -h localhost -U testuser -p 7000 bosa_fts_ta
 kill -TERM $PFW
 PFW=""
-oc process -f sign-validation/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}},{"configMapRef": {"name": "signvalidationsettings"}},{"configMapRef":{"name":"httpproxysettings"}}]|.items[2].spec.host="validate.in.testing"|.items[2].spec.tls = {"insecureEdgeTerminationPolicy": "Redirect","termination":"edge"}|.items[2].spec.wildcardPolicy="None"'| oc create -f -
+oc process -f sign-validation/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].env[0]={"name":"JPDA_OPTS","value":"-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n"}|.items[0].spec.template.spec.containers[0].command=["catalina.sh","jpda","run"]|.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}},{"configMapRef": {"name": "signvalidationsettings"}},{"configMapRef":{"name":"httpproxysettings"}}]|.items[2].spec.host="validate.in.testing"|.items[2].spec.tls = {"insecureEdgeTerminationPolicy": "Redirect","termination":"edge"}|.items[2].spec.wildcardPolicy="None"'| oc create -f -
 oc process -f GUI-sign/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].envFrom = [{"configMapRef": {"name":"databaseconfig"}},{"configMapRef":{"name":"httpproxysettings"}}]|.items[2].spec.host="sign.in.testing"|.items[2].spec.tls={"insecureEdgeTerminationPolicy":"Redirect","termination":"edge"}|.items[2].spec.wildcardPolicy="None"|.items[0].spec.template.spec.containers[0].volumeMounts=[{"name":"config-volume","mountPath":"/app/build/config"}]|.items[0].spec.template.spec.volumes = [{"name":"config-volume","configMap":{"name":"gui-config"}}]|.items[0].spec.template.spec.containers[0].command=["serve"]|.items[0].spec.template.spec.containers[0].args=["-s","-S","build"]'| oc create -f -
-oc process -f IDP/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].image="registry-fsf.services.belgium.be:5000/eidas/idp:develop"|.items[2].spec.host="idp.in.testing"|.items[2].spec.tls={"insecureEdgeTerminationPolicy":"Redirect","termination":"edge"}|.items[2].spec.wildcardPolicy="None"|.items[0].spec.template.spec.containers[0].envFrom=[{"configMapRef":{"name":"idpconfig"}}]'|oc create -f -
+oc process -f IDP/bosadt-openshift-project.yaml | jq '.items[0].spec.template.spec.containers[0].env[0]={"name":"JPDA_OPTS","value":"-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n"}|.items[0].spec.template.spec.containers[0].command=["catalina.sh","jpda","run"]|.items[0].spec.template.spec.containers[0].image="registry-fsf.services.belgium.be:5000/eidas/idp:develop"|.items[2].spec.host="idp.in.testing"|.items[2].spec.tls={"insecureEdgeTerminationPolicy":"Redirect","termination":"edge"}|.items[2].spec.wildcardPolicy="None"|.items[0].spec.template.spec.containers[0].envFrom=[{"configMapRef":{"name":"idpconfig"}}]'|oc create -f -
 status "Done; the project should now be loading into your openshift."
 echo "To access the services, edit /etc/hosts to point sign.in.testing,"
 echo "validate.in.testing and idp.in.testing to" $(minishift ip)
@@ -112,6 +112,9 @@ echo "  * 'eval \$(minishift oc-env)' adds the 'oc' command to your shell's \$PA
 echo ""
 echo "  * 'oc rollout latest dc/signvalidation; oc rollout latest dc/guisign'; oc rollout latest dc/idp'"
 echo "    pulls the latest images"
+echo "  * 'oc get pods' lists the currently-running pods"
+echo "  * 'oc port-forward <pod name> <local port number>:<remote port number>'"
+echo "  * 'oc rsh <pod name>' gets you a shell in a pod"
 echo ""
 echo "  * 'minishift stop' stops the cluster (restart with 'minishift start')."
 echo ""
