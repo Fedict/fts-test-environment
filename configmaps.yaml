@@ -26,7 +26,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  CORS_ALLOWED_ORIGINS: 'http://localhost:3000,https://sign.in.testing'
+  CORS_ALLOWED_ORIGINS: 'http://localhost:3000,https://sign.local.test.belgium.be/,https://idp.local.test.belgium.be/'
   KEYSTORE_ENABLED: "true"
 kind: ConfigMap
 metadata:
@@ -37,7 +37,7 @@ kind: ConfigMap
 metadata:
   name: idpconfig
 data:
-  SIGNING_URL: "https://idp.in.testing"
+  SIGNING_URL: "https://idp.local.test.belgium.be/"
   HSM_MODULE: "/usr/lib/softhsm/libsofthsm2.so"
   HSM_USER_PIN: "12345"
   HSM_KEY_ID: "test_IdP"
