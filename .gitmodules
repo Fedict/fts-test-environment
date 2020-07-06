@@ -7,3 +7,6 @@
 [submodule "IDP"]
 	path = IDP
 	url = ../IDP.git
+[submodule "GUI-IDP"]
+	path = GUI-IDP
+	url = ../GUI-IDP.git
