@@ -26,7 +26,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  CORS_ALLOWED_ORIGINS: 'http://localhost:3000,https://sign.local.test.belgium.be/,https://idp.local.test.belgium.be/'
+  CORS_ALLOWED_ORIGINS: 'http://localhost:3000,https://sign.local.test.belgium.be,https://idp.local.test.belgium.be'
   KEYSTORE_ENABLED: "true"
 kind: ConfigMap
 metadata:
