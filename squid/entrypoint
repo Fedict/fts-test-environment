@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -f /etc/config/allowed_urls ]; then
+if [ ! -f /etc/config/allowed_urls ]; then
 	# allow all
 	echo "http_access allow localnet" > /etc/squid/conf.d/acls.conf
 else
