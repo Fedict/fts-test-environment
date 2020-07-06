@@ -7,5 +7,5 @@ data:
   # If the following is uncommented, only the domains listed therein
   # will be allowed. If it is not, then all domains will be allowed.
   #allowed_urls: |
-  #  validate.ta.fts.belgium.be
-  #  sign.ta.fts.belgium.be
+  #  validate.ta.fts.bosa.belgium.be
+  #  sign.ta.fts.bosa.belgium.be
