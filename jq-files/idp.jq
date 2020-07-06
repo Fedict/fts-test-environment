@@ -1,0 +1,14 @@
+.items[0].spec.template.spec.containers[0].env[0]={"name":"JPDA_OPTS","value":"-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n"}
+|.items[0].spec.template.spec.containers[0].command=["catalina.sh","jpda","run"]
+|.items[0].spec.template.spec.containers[0].image="registry-fsf.services.belgium.be:5000/eidas/idp:develop"
+|.items[0].spec.template.spec.initContainers[0].image="registry-fsf.services.belgium.be:5000/eidas/idp:develop"
+|.items[2].spec.host="idp.local.test.belgium.be"
+|.items[3].spec.host="idp.local.test.belgium.be"
+|.items[4].spec.host="idp.local.test.belgium.be"
+|.items[5].spec.host="idp.local.test.belgium.be"
+|.items[2].spec.tls={"insecureEdgeTerminationPolicy":"Redirect","termination":"edge"}
+|.items[3].spec.tls={"insecureEdgeTerminationPolicy":"Redirect","termination":"edge"}
+|.items[4].spec.tls={"insecureEdgeTerminationPolicy":"Redirect","termination":"edge"}
+|.items[5].spec.tls={"insecureEdgeTerminationPolicy":"Redirect","termination":"edge"}
+|.items[2].spec.wildcardPolicy="None"
+|.items[0].spec.template.spec.containers[0].envFrom=[{"configMapRef":{"name":"idpconfig"}}]
