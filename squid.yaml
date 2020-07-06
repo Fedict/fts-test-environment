@@ -42,6 +42,13 @@ objects:
             requests:
               cpu: 50m
               memory: 64Mi
+          volumeMounts:
+            name: config-volume
+            mountPath: /etc/config
+        volumes:
+          name: config-volume
+          configMap:
+            name: squidwhitelist
 - apiVersion: v1
   kind: Service
   metadata:

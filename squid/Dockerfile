@@ -11,6 +11,5 @@ RUN mkdir -p /var/log/squid \
 	&& chmod go+w /var/run
 EXPOSE 3128/tcp
 COPY ./entrypoint /usr/local/sbin/
-COPY ./acls.conf /etc/squid/conf.d/
 ENTRYPOINT /usr/local/sbin/entrypoint
 USER proxy
