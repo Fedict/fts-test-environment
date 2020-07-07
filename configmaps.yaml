@@ -46,4 +46,4 @@ data:
   IDP_URL: "https://fas.url"
   FAS_CERTIFICATE_FILENAME: "/etc/config/fas.pem"
   FAS_CLIENT_ID: "IAMFAS"
-  CORS_ALLOWED_ORIGINS: 'http://localhost:3000'
+  CORS_ALLOWED_ORIGINS: 'http://localhost:3000,https://idp.local.test.belgium.be'
