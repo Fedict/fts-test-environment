@@ -38,7 +38,7 @@ kind: ConfigMap
 metadata:
   name: idpconfig
 data:
-  SIGNING_URL: "https://validate.ta.fts.bosa.belgium.be/"
+  SIGNING_URL: "http://signvalidation-svc.bosa-trust-services.svc.cluster.local/"
   HSM_MODULE: "/usr/lib/softhsm/libsofthsm2.so"
   HSM_USER_PIN: "12345"
   HSM_KEY_ID: "test_IdP"
