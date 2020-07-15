@@ -47,6 +47,7 @@ eval $(minishift oc-env)
 oc login -u system -p admin
 if [ "$(oc get -o json project bosa-trust-services 2>/dev/null | jq '.status.phase')" = '"Active"' ]; then
 	status "old bosa-trust-services project found. Exporting credentials & deleting..."
+	oc project bosa-trust-services
 	json=$(oc get -o json secret/bosa-registry)
 	if [ ! -z "$json" ]; then
 		user=$(echo $json|jq -r '.data[".dockerconfigjson"]'|base64 -d|jq -r '.auths["registry-fsf.services.belgium.be:5000"]["username"]')
