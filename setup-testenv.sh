@@ -77,6 +77,7 @@ fi
 oc create secret docker-registry bosa-registry --docker-server=registry-fsf.services.belgium.be:5000 --docker-username="$user" --docker-password="$pass" --docker-email="$user"@zetes.com
 oc secrets link default bosa-registry --for=pull
 oc create secret generic softhsm-tokens --from-file=softhsm-tokens.tgz
+oc create secret generic softhsm-tokens-esealing --from-file=softhsm-tokens-esealing.tgz
 sleep 1
 status "Loading images..."
 oc create -f configmaps.yaml
@@ -110,6 +111,7 @@ oc process -f sign-validation/bosadt-openshift-project.yaml | jq -f ./jq-files/s
 oc process -f GUI-sign/bosadt-openshift-project.yaml | jq -f ./jq-files/gui-sign.jq | oc create -f -
 oc process -f IDP/bosadt-openshift-project.yaml | jq -f ./jq-files/idp.jq |oc create -f -
 oc process -f GUI-IDP/bosadt-openshift-project.yaml | jq -f ./jq-files/gui-idp.jq | oc create -f -
+oc process -f esealing/bosadt-openshift-project.yaml | jq -f ./jq-files/esealing.jq | oc create -f -
 status "Done; the project should now be loading into your openshift."
 echo "To access the services, edit /etc/hosts to point sign.local.test.belgium.be,"
 echo "validate.local.test.belgium.be and idp.local.test.belgium.be to" $(minishift ip)
