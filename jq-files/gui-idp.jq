@@ -6,3 +6,5 @@
 |.items[0].spec.template.spec.volumes = [{"name":"config-volume","configMap":{"name":"gui-idp-config"}}]
 |.items[0].spec.template.spec.containers[0].command=["serve"]
 |.items[0].spec.template.spec.containers[0].args=["-s","-S","build"]
+|.items[0].spec.template.spec.containers[0].image="guiidp:latest"
+|.items[0].spec.triggers=[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["guiidp"],"from":{"kind":"ImageStreamTag","name":"guiidp:latest"}}}]

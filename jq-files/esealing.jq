@@ -5,3 +5,6 @@
 |.items[2].spec.host="esealing.local.test.belgium.be"
 |.items[2].spec.tls={"insecureEdgeTerminationPolicy":"Redirect","termination":"edge"}
 |.items[2].spec.wildcardPolicy="None"
+|.items[0].spec.template.spec.containers[0].image="esealing:latest"
+|.items[0].spec.template.spec.initContainers[0].image="esealing:latest"
+|.items[0].spec.triggers=[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["esealing"],"from":{"kind":"ImageStreamTag","name":"esealing:latest"}}}]

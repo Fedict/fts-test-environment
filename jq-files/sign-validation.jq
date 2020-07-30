@@ -4,3 +4,4 @@
 |.items[2].spec.host="validate.local.test.belgium.be"
 |.items[2].spec.tls = {"insecureEdgeTerminationPolicy": "Redirect","termination":"edge"}
 |.items[2].spec.wildcardPolicy="None"
+|.items[0].spec.triggers=[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["signvalidation"],"from":{"kind":"ImageStreamTag","name":"signvalidation:latest"}}}]

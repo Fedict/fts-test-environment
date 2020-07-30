@@ -1,0 +1,138 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: imagestreams
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: esealing
+  spec:
+    lookupPolicy:
+      local: true
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: guiidp
+  spec:
+    lookupPolicy:
+      local: true
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: guisign
+  spec:
+    lookupPolicy:
+      local: true
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: idp
+  spec:
+    lookupPolicy:
+      local: true
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: signvalidation
+  spec:
+    lookupPolicy:
+      local: true
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: squid
+  spec:
+    lookupPolicy:
+      local: true
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: esealing
+  spec:
+    source:
+      git:
+        uri: "https://git-fsf.services.belgium.be/eidas/esealing.git"
+        ref: develop
+    strategy:
+      dockerStrategy: {}
+    output:
+      to:
+        kind: ImageStreamTag
+        name: esealing:latest
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: guiidp
+  spec:
+    source:
+      git:
+        uri: "https://git-fsf.services.belgium.be/eidas/GUI-IDP.git"
+        ref: develop
+    strategy:
+      dockerStrategy: {}
+    output:
+      to:
+        kind: ImageStreamTag
+        name: guiidp:latest
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: guisign
+  spec:
+    source:
+      git:
+        uri: "https://git-fsf.services.belgium.be/eidas/GUI-sign.git"
+        ref: develop
+    strategy:
+      dockerStrategy: {}
+    output:
+      to:
+        kind: ImageStreamTag
+        name: guisign:latest
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: idp
+  spec:
+    source:
+      git:
+        uri: "https://git-fsf.services.belgium.be/eidas/IDP.git"
+        ref: develop
+    strategy:
+      dockerStrategy: {}
+    output:
+      to:
+        kind: ImageStreamTag
+        name: idp:latest
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: signvalidation
+  spec:
+    source:
+      git:
+        uri: "https://git-fsf.services.belgium.be/eidas/sign-validation.git"
+        ref: develop
+    strategy:
+      dockerStrategy: {}
+    output:
+      to:
+        kind: ImageStreamTag
+        name: signvalidation:latest
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: squid
+  spec:
+    source:
+      git:
+        uri: "https://git-fsf.services.belgium.be/eidas/test-environment.git"
+        ref: master
+      contextDir: squid
+    strategy:
+      dockerStrategy: {}
+    output:
+      to:
+        kind: ImageStreamTag
+        name: squid:latest

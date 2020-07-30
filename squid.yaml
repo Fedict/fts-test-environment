@@ -13,6 +13,16 @@ objects:
     name: squid
   spec:
     replicas: 1
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - squid
+        from:
+          kind: ImageStreamTag
+          name: squid:latest
     selector:
       deploymentconfig: squid
     strategy:
@@ -31,7 +41,7 @@ objects:
           deploymentconfig: squid
       spec:
         containers:
-        - image: registry-fsf.services.belgium.be:5000/eidas/test-environment/squid:latest
+        - image: squid:latest
           imagePullPolicy: Always
           name: squid
           port: 3128

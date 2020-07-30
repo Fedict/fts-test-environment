@@ -36,51 +36,39 @@ require_cmd minishift
 require_cmd psql
 require_cmd stty
 require_cmd base64
+require_cmd mvn
 
 status "Pulling submodules..."
 git submodule init
 git submodule update
 status "Starting minishift..."
 minishift start
+minishift config set routing-suffix "local.test.belgium.be"
 status "Creating project..."
 eval $(minishift oc-env)
 oc login -u system -p admin
 if [ "$(oc get -o json project bosa-trust-services 2>/dev/null | jq '.status.phase')" = '"Active"' ]; then
-	status "old bosa-trust-services project found. Exporting credentials & deleting..."
-	oc project bosa-trust-services
-	json=$(oc get -o json secret/bosa-registry)
-	if [ ! -z "$json" ]; then
-		user=$(echo $json|jq -r '.data[".dockerconfigjson"]'|base64 -d|jq -r '.auths["registry-fsf.services.belgium.be:5000"]["username"]')
-		pass=$(echo $json|jq -r '.data[".dockerconfigjson"]'|base64 -d|jq -r '.auths["registry-fsf.services.belgium.be:5000"]["password"]')
-	fi
+	status "old bosa-trust-services project found. Deleting..."
 	oc delete project bosa-trust-services
 	sleep 60
 fi
 oc new-project --display-name="BOSA Trust Services" bosa-trust-services
+status "Creating ImageStreams and builds..."
+oc process -f builds-streams.yaml | oc apply -f -
 status "Setting up secrets..."
-echo "Please enter your credentials for https://git-fsf.services.belgium.be/"
-echo "Note that these will be stored inside the OpenShift environment. For security"
-echo "reasons, you should therefore create an access token with the 'read_registry'"
-echo "scope (and nothing else) at"
-echo "https://git-fsf.services.belgium.be/profile/personal_access_tokens"
-if [ -z "$user" ]; then
-	printf %s "Username: "
-	read user
-fi
-if [ -z "$pass" ]; then
-	stty_orig=$(stty -g)
-	stty -echo
-	printf %s "Access token: "
-	read pass
-	stty $stty_orig
-	echo ""
-fi
-oc create secret docker-registry bosa-registry --docker-server=registry-fsf.services.belgium.be:5000 --docker-username="$user" --docker-password="$pass" --docker-email="$user"@zetes.com
-oc secrets link default bosa-registry --for=pull
 oc create secret generic softhsm-tokens --from-file=softhsm-tokens.tgz
 oc create secret generic softhsm-tokens-esealing --from-file=softhsm-tokens-esealing.tgz
 sleep 1
 status "Loading images..."
+oc start-build --from-dir=$(pwd) squid
+(cd esealing; mvn install)
+oc start-build --from-dir=$(pwd)/esealing esealing
+oc start-build --from-dir=$(pwd)/GUI-IDP guiidp
+oc start-build --from-dir=$(pwd)/GUI-sign guisign
+(cd IDP; mvn install)
+oc start-build --from-dir=$(pwd)/IDP idp
+(cd sign-validation; mvn install)
+oc start-build --from-dir=$(pwd)/sign-validation signvalidation
 oc create -f configmaps.yaml
 
 # Create config maps for frontend code

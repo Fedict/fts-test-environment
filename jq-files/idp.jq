@@ -12,3 +12,6 @@
 |.items[5].spec.tls={"insecureEdgeTerminationPolicy":"Redirect","termination":"edge"}
 |.items[2].spec.wildcardPolicy="None"
 |.items[0].spec.template.spec.containers[0].envFrom=[{"configMapRef":{"name":"idpconfig"}}]
+|.items[0].spec.template.spec.containers[0].image="idp:latest"
+|.items[0].spec.template.spec.initContainers[0].image="idp:latest"
+|.items[0].spec.triggers=[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["idp"],"from":{"kind":"ImageStreamTag","name":"idp:latest"}}}]
