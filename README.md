@@ -18,8 +18,8 @@ guide](https://docs.okd.io/3.11/minishift/getting-started/index.html)
   to redirect the services to the right IP address (as shown at the end
   of `setup-environment.sh`, or which you can recall by way of
   `minishift ip`.
-- Wait until all the images have been downloaded (this depends on the
-  speed of your Internet connection...)
+- Wait until all the images have been built (this depends on the speed
+  of your Internet connection...)
 - Profit!
 
 If you want to delete the project, run `eval $(minishift oc-env)`, then
@@ -43,4 +43,35 @@ to see a list of the available pods; then
 to get a shell on the first container inside that pod (currently all
 pods only have one container)
 
+To update a deployment, "cd" into the directory that contains a checkout
+of the relevant git repository for the project in question (this can be
+a checkout somewhere else, and doesn't have to be the one in this
+directory); then run
+
+    mvn -DskipTests package # only if this is a Java project
+    oc start-build --from-dir=$(pwd) projectname
+
+Where `projectname` is the relevant build name (you can get a list with
+`oc get bc`. Add the parameter `-F` to `start-build` to follow the build
+log. After the build finishes, minishift will automatically restart the
+container with the software.
+
+You can rerun `setup-testenv.sh` after a `git pull` in this directory in
+case relevant changes have been made to the script and you want the new
+version. Note though that that will delete all deployments and start
+everything again from scratch, although some caching will be involved.
+
+If running `setup-testenv.sh` fails with the message that the project
+"bosa-trust-services" already exists, then just wait a minute or two and
+try again.
+
 For more questions, talk to Wouter.
+
+# Platform support
+
+`minishift` exists for Linux, Windows, and macOS. However, currently the
+script has only been tested on Linux.
+
+Since macOS is a Unix, it *should* work, although this has not yet been
+tested. For Windows, you'll need some form of a Unix shell; either
+WSL or something like cygwin might work. This, too, has not been tested.
