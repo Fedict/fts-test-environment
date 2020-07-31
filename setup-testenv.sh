@@ -61,13 +61,13 @@ oc create secret generic softhsm-tokens-esealing --from-file=softhsm-tokens-esea
 sleep 1
 status "Loading images..."
 oc start-build --from-dir=$(pwd) squid
-(cd esealing; mvn install)
+(cd esealing; mvn -DskipTests install)
 oc start-build --from-dir=$(pwd)/esealing esealing
 oc start-build --from-dir=$(pwd)/GUI-IDP guiidp
 oc start-build --from-dir=$(pwd)/GUI-sign guisign
-(cd IDP; mvn install)
+(cd IDP; mvn -DskipTests install)
 oc start-build --from-dir=$(pwd)/IDP idp
-(cd sign-validation; mvn install)
+(cd sign-validation; mvn -DskipTests install)
 oc start-build --from-dir=$(pwd)/sign-validation signvalidation
 oc create -f configmaps.yaml
 
