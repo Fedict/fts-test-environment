@@ -103,7 +103,8 @@ oc process -f GUI-IDP/bosadt-openshift-project.yaml | jq -f ./jq-files/gui-idp.j
 oc process -f esealing/bosadt-openshift-project.yaml | jq -f ./jq-files/esealing.jq | oc create -f -
 status "Done; the project should now be loading into your openshift."
 echo "To access the services, edit /etc/hosts to point sign.local.test.belgium.be,"
-echo "validate.local.test.belgium.be and idp.local.test.belgium.be to" $(minishift ip)
+echo "validate.local.test.belgium.be, esealing.local.test.belgium.be,"
+echo "and idp.local.test.belgium.be to" $(minishift ip)
 echo "To move on:"
 echo "  * 'minishift console' opens the OpenShift console in your default browser"
 echo "    (log on with user name 'system' and password 'admin')"
