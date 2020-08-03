@@ -9,6 +9,7 @@ data:
   SIGNING_SCHEMA: signing
   SIGNING_URL: 'jdbc:postgresql://postgresql:5432/bosa_fts_ta'
   SIGNING_USER: testuser
+  READY_MARKFILE: '/tmp/lotl.ready'
 kind: ConfigMap
 metadata:
   name: databaseconfig
