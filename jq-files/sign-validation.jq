@@ -5,4 +5,4 @@
 |.items[2].spec.tls = {"insecureEdgeTerminationPolicy": "Redirect","termination":"edge"}
 |.items[2].spec.wildcardPolicy="None"
 |.items[0].spec.triggers=[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["signvalidation"],"from":{"kind":"ImageStreamTag","name":"signvalidation:latest"}}}]
-|.items[0].spec.template.spec.containers[0].livenessProbe={"exec":{"command":["cat","/tmp/lotl.ready"]},"periodSeconds": 30,"initialDelaySeconds":300,"failureThreshold":5}
+|.items[0].spec.template.spec.containers[0].livenessProbe={"exec":{"command":["cat","/tmp/lotl.ready"]},"periodSeconds": 60,"initialDelaySeconds":300,"failureThreshold":5}
