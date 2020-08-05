@@ -46,5 +46,6 @@ data:
   HSM_SLOT: "0"
   IDP_URL: "https://fas.url"
   FAS_CERTIFICATE_FILENAME: "/etc/config/fas.pem"
+  FAS_REQUIRE_SIGNED: 'false'
   FAS_CLIENT_ID: "IAMFAS"
   CORS_ALLOWED_ORIGINS: 'http://localhost:3000,https://idp.local.test.belgium.be'
