@@ -46,6 +46,13 @@ objects:
     lookupPolicy:
       local: true
 - apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: tomcat-oraclejdk
+  spec:
+    lookupPolicy:
+      local: true
+- apiVersion: v1
   kind: BuildConfig
   metadata:
     name: esealing
@@ -100,11 +107,30 @@ objects:
         uri: "https://git-fsf.services.belgium.be/eidas/IDP.git"
         ref: develop
     strategy:
-      dockerStrategy: {}
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: tomcat-oraclejdk:latest
     output:
       to:
         kind: ImageStreamTag
         name: idp:latest
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: tomcat-oraclejdk
+  spec:
+    source:
+      git:
+        uri: "https://git-fsf.services.belgium.be/eidas/IDP.git"
+        ref: develop
+      contextDir: oracle-jdk-dockerfile
+    strategy:
+      dockerStrategy: {}
+    output:
+      to:
+        kind: ImageStreamTag
+        name: tomcat-oraclejdk:latest
 - apiVersion: v1
   kind: BuildConfig
   metadata:

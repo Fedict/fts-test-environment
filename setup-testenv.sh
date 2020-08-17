@@ -37,6 +37,7 @@ require_cmd psql
 require_cmd stty
 require_cmd base64
 require_cmd mvn
+require_cmd git-lfs
 
 status "Pulling submodules..."
 git submodule init
@@ -60,6 +61,7 @@ oc create secret generic softhsm-tokens --from-file=softhsm-tokens.tgz
 oc create secret generic softhsm-tokens-esealing --from-file=softhsm-tokens-esealing.tgz
 sleep 1
 status "Loading images..."
+oc start-build --from-dir=$(pwd)/IDP tomcat-oraclejdk
 oc start-build --from-dir=$(pwd) squid
 (cd esealing; mvn -DskipTests install)
 oc start-build --from-dir=$(pwd)/esealing esealing
