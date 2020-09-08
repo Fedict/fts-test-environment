@@ -36,7 +36,6 @@ require_cmd minishift
 require_cmd psql
 require_cmd stty
 require_cmd base64
-require_cmd mvn
 require_cmd git-lfs
 
 status "Pulling submodules..."
@@ -61,16 +60,18 @@ oc create secret generic softhsm-tokens --from-file=softhsm-tokens.tgz
 oc create secret generic softhsm-tokens-esealing --from-file=softhsm-tokens-esealing.tgz
 sleep 1
 status "Loading images..."
+oc start-build --from-dir=$(pwd) mvn-dockers
 oc start-build --from-dir=$(pwd)/IDP tomcat-oraclejdk
 oc start-build --from-dir=$(pwd) squid
-(cd esealing; mvn -DskipTests install)
-oc start-build --from-dir=$(pwd)/esealing esealing
+oc start-build --from-dir=$(pwd)/esealing mvn-esealing
 oc start-build --from-dir=$(pwd)/GUI-IDP guiidp
 oc start-build --from-dir=$(pwd)/GUI-sign guisign
-(cd IDP; mvn -DskipTests install)
-oc start-build --from-dir=$(pwd)/IDP idp
-(cd sign-validation; mvn -DskipTests install)
-oc start-build --from-dir=$(pwd)/sign-validation signvalidation
+while [ -z "$(oc get -o json build/tomcat-oraclejdk-1 | jq '.status.completionTimestamp')" ]; do
+	echo "tomcat build not ready yet. Waiting..."
+	sleep 10
+done
+oc start-build --from-dir=$(pwd)/IDP mvn-idp
+oc start-build --from-dir=$(pwd)/sign-validation mvn-signvalidation
 oc create -f configmaps.yaml
 
 # Create config maps for frontend code
@@ -113,8 +114,15 @@ echo "    (log on with user name 'system' and password 'admin')"
 echo ""
 echo "  * 'eval \$(minishift oc-env)' adds the 'oc' command to your shell's \$PATH"
 echo ""
-echo "  * 'oc rollout latest dc/signvalidation; oc rollout latest dc/guisign'; oc rollout latest dc/idp'"
-echo "    pulls the latest images"
+echo "  * 'oc start-build --from-dir=. -F mvn-dockers' updates the 'Dockerfile's"
+echo "    used for Java-using images"
+echo "  * For rebuilding/updating images:"
+echo "    * esealing: 'oc start-build --from-dir=./esealing -F mvn-esealing'"
+echo "    * IDP GUI: 'oc start-build --from-dir=./GUI-IDP -F guiidp'"
+echo "    * Signing GUI: 'oc start-build --from-dir=./GUI-sign -F guisign'"
+echo "    * IDP backend: 'oc start-build --from-dir=./IDP -F mvn-idp'"
+echo "    * Sign/validation backend: 'oc start-build --from-dir=./sign-validation -F mvn-signvalidation'"
+echo "    Note that a rebuild automatically triggers a restart of the (new) image"
 echo "  * 'oc get pods' lists the currently-running pods"
 echo "  * 'oc port-forward <pod name> <local port number>:<remote port number>'"
 echo "  * 'oc rsh <pod name>' gets you a shell in a pod"

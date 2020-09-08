@@ -53,29 +53,117 @@ objects:
     lookupPolicy:
       local: true
 - apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: mvn-signvalidation
+  spec:
+    lookupPolicy:
+      local: true
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: mvn-dockers
+  spec:
+    lookupPolicy:
+      local: true
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: mvn-idp
+  spec:
+    lookupPolicy:
+      local: true
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: mvn-esealing
+  spec:
+    lookupPolicy:
+      local: true
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: mvn-dockers
+  spec:
+    source:
+      binary: {}
+      dockerfile: |
+        FROM scratch
+        COPY . /build
+    strategy:
+      dockerStrategy: {}
+    output:
+      to:
+        kind: ImageStreamTag
+        name: mvn-dockers:latest
+    triggers:
+    - type: ConfigChange
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: mvn-esealing
+  spec:
+    source:
+      binary: {}
+      dockerfile: |
+        FROM maven:3-jdk-8
+        COPY . /build
+        RUN cd /build; mvn -DskipTests package
+    strategy:
+      dockerStrategy:
+        from:
+          kind: DockerImage
+          name: "maven:3-jdk-8"
+    output:
+      to:
+        kind: ImageStreamTag
+        name: mvn-esealing:latest
+    triggers:
+    - type: ConfigChange
+- apiVersion: v1
   kind: BuildConfig
   metadata:
     name: esealing
   spec:
     source:
-      git:
-        uri: "https://git-fsf.services.belgium.be/eidas/esealing.git"
-        ref: develop
+      images:
+      - from:
+          kind: ImageStreamTag
+          name: mvn-esealing:latest
+        paths:
+        - destinationDir: esealing-ws/target
+          sourcePath: /build/esealing-ws/target/esealing-ws-0.0.1-SNAPSHOT.war
+      - from:
+          kind: ImageStreamTag
+          name: mvn-dockers:latest
+        paths:
+        - destinationDir: ./
+          sourcePath: /build/esealing/Dockerfile
     strategy:
       dockerStrategy: {}
     output:
       to:
         kind: ImageStreamTag
         name: esealing:latest
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChange:
+        from:
+          kind: ImageStreamTag
+          name: mvn-esealing:latest
+    - type: ImageChange
+      imageChange:
+        from:
+          kind: ImageStreamTag
+          name: mvn-dockers:latest
 - apiVersion: v1
   kind: BuildConfig
   metadata:
     name: guiidp
   spec:
     source:
-      git:
-        uri: "https://git-fsf.services.belgium.be/eidas/GUI-IDP.git"
-        ref: develop
+      binary: {}
     strategy:
       dockerStrategy: {}
     output:
@@ -88,9 +176,7 @@ objects:
     name: guisign
   spec:
     source:
-      git:
-        uri: "https://git-fsf.services.belgium.be/eidas/GUI-sign.git"
-        ref: develop
+      binary: {}
     strategy:
       dockerStrategy: {}
     output:
@@ -100,12 +186,44 @@ objects:
 - apiVersion: v1
   kind: BuildConfig
   metadata:
+    name: mvn-idp
+  spec:
+    source:
+      binary: {}
+      dockerfile: |
+        FROM maven:3-jdk-8
+        COPY . /build
+        RUN cd /build; mvn -DskipTests package
+    strategy:
+      dockerStrategy:
+        from:
+          kind: DockerImage
+          name: "maven:3-jdk-8"
+    output:
+      to:
+        kind: ImageStreamTag
+        name: mvn-idp:latest
+    triggers:
+    - type: ConfigChange
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
     name: idp
   spec:
     source:
-      git:
-        uri: "https://git-fsf.services.belgium.be/eidas/IDP.git"
-        ref: develop
+      images:
+      - from:
+          kind: ImageStreamTag
+          name: mvn-idp:latest
+        paths:
+        - destinationDir: IDP-ws/target
+          sourcePath: /build/IDP-ws/target/IDP-ws-0.0.1-SNAPSHOT.war
+      - from:
+          kind: ImageStreamTag
+          name: mvn-dockers:latest
+        paths:
+        - destinationDir: .
+          sourcePath: /build/IDP/Dockerfile
     strategy:
       dockerStrategy:
         from:
@@ -115,15 +233,30 @@ objects:
       to:
         kind: ImageStreamTag
         name: idp:latest
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChange:
+        from:
+          kind: ImageStreamTag
+          name: mvn-signvalidation:latest
+    - type: ImageChange
+      imageChange:
+        from:
+          kind: ImageStreamTag
+          name: tomcat-oraclejdk:latest
+    - type: ImageChange
+      imageChange:
+        from:
+          kind: ImageStreamTag
+          name: mvn-dockers:latest
 - apiVersion: v1
   kind: BuildConfig
   metadata:
     name: tomcat-oraclejdk
   spec:
     source:
-      git:
-        uri: "https://git-fsf.services.belgium.be/eidas/IDP.git"
-        ref: develop
+      binary: {}
       contextDir: oracle-jdk-dockerfile
     strategy:
       dockerStrategy: {}
@@ -134,27 +267,71 @@ objects:
 - apiVersion: v1
   kind: BuildConfig
   metadata:
+    name: mvn-signvalidation
+  spec:
+    source:
+      binary: {}
+      dockerfile: |
+        FROM maven:3-jdk-8
+        COPY . /build
+        RUN cd /build; mvn -DskipTests package
+    strategy:
+      dockerStrategy:
+        from:
+          kind: DockerImage
+          name: "maven:3-jdk-8"
+    output:
+      to:
+        kind: ImageStreamTag
+        name: mvn-signvalidation:latest
+    triggers:
+    - type: ConfigChange
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
     name: signvalidation
   spec:
     source:
-      git:
-        uri: "https://git-fsf.services.belgium.be/eidas/sign-validation.git"
-        ref: develop
+      images:
+      - from:
+          kind: ImageStreamTag
+          name: mvn-signvalidation:latest
+        paths:
+        - destinationDir: signandvalidation-ws/target
+          sourcePath: /build/signandvalidation-ws/target/signandvalidation-ws-0.0.1-SNAPSHOT.war
+        - destinationDir: ./
+          sourcePath: /build/catalina_wrapper.sh
+      - from:
+          kind: ImageStreamTag
+          name: mvn-dockers:latest
+        paths:
+        - destinationDir: ./
+          sourcePath: /build/sign-validation/Dockerfile
     strategy:
       dockerStrategy: {}
     output:
       to:
         kind: ImageStreamTag
         name: signvalidation:latest
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChange:
+        from:
+          kind: ImageStreamTag
+          name: mvn-signvalidation:latest
+    - type: ImageChange
+      imageChange:
+        from:
+          kind: ImageStreamTag
+          name: mvn-dockers:latest
 - apiVersion: v1
   kind: BuildConfig
   metadata:
     name: squid
   spec:
     source:
-      git:
-        uri: "https://git-fsf.services.belgium.be/eidas/test-environment.git"
-        ref: master
+      binary: {}
       contextDir: squid
     strategy:
       dockerStrategy: {}
