@@ -239,7 +239,7 @@ objects:
       imageChange:
         from:
           kind: ImageStreamTag
-          name: mvn-signvalidation:latest
+          name: mvn-idp:latest
     - type: ImageChange
       imageChange:
         from:
