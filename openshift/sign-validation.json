@@ -1,0 +1,170 @@
+{
+  "kind": "List",
+  "apiVersion": "v1",
+  "metadata": {},
+  "items": [
+    {
+      "apiVersion": "apps.openshift.io/v1",
+      "kind": "DeploymentConfig",
+      "metadata": {
+        "name": "signvalidation"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "deploymentconfig": "signvalidation"
+        },
+        "strategy": {
+          "resources": {},
+          "rollingParams": {
+            "intervalSeconds": 1,
+            "maxSurge": "100%",
+            "maxUnavailable": "0%",
+            "timeoutSeconds": 600,
+            "updatePeriodSeconds": 1
+          },
+          "type": "Rolling"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "application": "signvalidation",
+              "deploymentconfig": "signvalidation"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "env": [
+                  {
+                    "name": "JPDA_OPTS",
+                    "value": "-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n"
+                  }
+                ],
+                "image": "registry-fsf.services.belgium.be:5000/eidas/sign-validation:latest",
+                "imagePullPolicy": "Always",
+                "name": "signvalidation",
+                "port": [],
+                "resources": {
+                  "limits": {
+                    "cpu": "1000m",
+                    "memory": "1024Mi"
+                  },
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "64Mi"
+                  }
+                },
+                "command": [
+                  "catalina.sh",
+                  "jpda",
+                  "run"
+                ],
+                "envFrom": [
+                  {
+                    "configMapRef": {
+                      "name": "databaseconfig"
+                    }
+                  },
+                  {
+                    "configMapRef": {
+                      "name": "signvalidationsettings"
+                    }
+                  },
+                  {
+                    "configMapRef": {
+                      "name": "httpproxysettings"
+                    }
+                  }
+                ],
+                "livenessProbe": {
+                  "exec": {
+                    "command": [
+                      "cat",
+                      "/tmp/lotl.ready"
+                    ]
+                  },
+                  "periodSeconds": 60,
+                  "initialDelaySeconds": 300,
+                  "failureThreshold": 5
+                }
+              }
+            ]
+          }
+        },
+        "triggers": [
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "ImageChange",
+            "imageChangeParams": {
+              "automatic": true,
+              "containerNames": [
+                "signvalidation"
+              ],
+              "from": {
+                "kind": "ImageStreamTag",
+                "name": "signvalidation:latest"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "annotations": {
+          "description": "The Container Sign and Validatione"
+        },
+        "name": "signvalidation-svc"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "signvalidation-web",
+            "port": 80,
+            "protocol": "TCP",
+            "targetPort": 8080
+          },
+          {
+            "name": "signvalidation-web-ssl",
+            "port": 443,
+            "protocol": "TCP",
+            "targetPort": 8080
+          }
+        ],
+        "selector": {
+          "deploymentconfig": "signvalidation"
+        }
+      }
+    },
+    {
+      "apiVersion": "route.openshift.io/v1",
+      "kind": "Route",
+      "metadata": {
+        "annotations": {
+          "description": "The route to expose the Validation port"
+        },
+        "name": "signvalidation-validate"
+      },
+      "spec": {
+        "host": "validate.local.test.belgium.be",
+        "port": {
+          "targetPort": "signvalidation-web-ssl"
+        },
+        "to": {
+          "kind": "Service",
+          "name": "signvalidation-svc"
+        },
+        "tls": {
+          "insecureEdgeTerminationPolicy": "Redirect",
+          "termination": "edge"
+        },
+        "wildcardPolicy": "None"
+      }
+    }
+  ]
+}

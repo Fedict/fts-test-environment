@@ -1,0 +1,185 @@
+{
+  "kind": "List",
+  "apiVersion": "v1",
+  "metadata": {},
+  "items": [
+    {
+      "apiVersion": "apps.openshift.io/v1",
+      "kind": "DeploymentConfig",
+      "metadata": {
+        "name": "esealing"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "deploymentconfig": "esealing"
+        },
+        "strategy": {
+          "resources": {},
+          "rollingParams": {
+            "intervalSeconds": 1,
+            "maxSurge": "100%",
+            "maxUnavailable": "0%",
+            "timeoutSeconds": 600,
+            "updatePeriodSeconds": 1
+          },
+          "type": "Rolling"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "application": "esealing",
+              "deploymentconfig": "esealing"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "image": "esealing:latest",
+                "imagePullPolicy": "Always",
+                "livenessProbe": {
+                  "httpGet": {
+                    "path": "/esealing/ping",
+                    "port": 8080
+                  },
+                  "periodSeconds": 30,
+                  "timeoutSeconds": 600
+                },
+                "name": "esealing",
+                "resources": {
+                  "limits": {
+                    "cpu": "1000m",
+                    "memory": "1024Mi"
+                  },
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "64Mi"
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "mountPath": "/var/lib/softhsm",
+                    "name": "softhsm-volume"
+                  }
+                ],
+                "env": [
+                  {
+                    "name": "JPDA_OPTS",
+                    "value": "-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n"
+                  }
+                ],
+                "command": [
+                  "catalina.sh",
+                  "jpda",
+                  "run"
+                ]
+              }
+            ],
+            "initContainers": [
+              {
+                "command": [
+                  "sh",
+                  "-c",
+                  "tar xvf /secret/softhsm-tokens-esealing.tgz -C /softhsm"
+                ],
+                "image": "esealing:latest",
+                "name": "softhsm",
+                "volumeMounts": [
+                  {
+                    "mountPath": "/softhsm",
+                    "name": "softhsm-volume"
+                  },
+                  {
+                    "mountPath": "/secret",
+                    "name": "secret"
+                  }
+                ]
+              }
+            ],
+            "volumes": [
+              {
+                "emptyDir": {},
+                "name": "softhsm-volume"
+              },
+              {
+                "name": "secret",
+                "secret": {
+                  "secretName": "softhsm-tokens-esealing"
+                }
+              }
+            ]
+          }
+        },
+        "triggers": [
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "ImageChange",
+            "imageChangeParams": {
+              "automatic": true,
+              "containerNames": [
+                "esealing"
+              ],
+              "from": {
+                "kind": "ImageStreamTag",
+                "name": "esealing:latest"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "annotations": {
+          "description": "The Container Sign and Validatione"
+        },
+        "name": "esealing-svc"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "esealing-web",
+            "port": 80,
+            "protocol": "TCP",
+            "targetPort": 8080
+          },
+          {
+            "name": "esealing-web-ssl",
+            "port": 443,
+            "protocol": "TCP",
+            "targetPort": 8080
+          }
+        ],
+        "selector": {
+          "deploymentconfig": "esealing"
+        }
+      }
+    },
+    {
+      "apiVersion": "route.openshift.io/v1",
+      "kind": "Route",
+      "metadata": {
+        "name": "esealing"
+      },
+      "spec": {
+        "host": "esealing.local.test.belgium.be",
+        "port": {
+          "targetPort": "esealing-web-ssl"
+        },
+        "to": {
+          "kind": "Service",
+          "name": "esealing-svc"
+        },
+        "tls": {
+          "insecureEdgeTerminationPolicy": "Redirect",
+          "termination": "edge"
+        },
+        "wildcardPolicy": "None"
+      }
+    }
+  ]
+}

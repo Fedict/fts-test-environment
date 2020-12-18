@@ -1,0 +1,166 @@
+{
+  "kind": "List",
+  "apiVersion": "v1",
+  "metadata": {},
+  "items": [
+    {
+      "apiVersion": "apps.openshift.io/v1",
+      "kind": "DeploymentConfig",
+      "metadata": {
+        "name": "guisign"
+      },
+      "spec": {
+        "replicas": 1,
+        "selector": {
+          "deploymentconfig": "guisign"
+        },
+        "strategy": {
+          "resources": {},
+          "rollingParams": {
+            "intervalSeconds": 1,
+            "maxSurge": "100%",
+            "maxUnavailable": "0%",
+            "timeoutSeconds": 600,
+            "updatePeriodSeconds": 1
+          },
+          "type": "Rolling"
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "application": "guisign",
+              "deploymentconfig": "guisign"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "env": [],
+                "image": "guisign:latest",
+                "imagePullPolicy": "Always",
+                "name": "guisign",
+                "port": [],
+                "resources": {
+                  "limits": {
+                    "cpu": "1000m",
+                    "memory": "1024Mi"
+                  },
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "64Mi"
+                  }
+                },
+                "envFrom": [
+                  {
+                    "configMapRef": {
+                      "name": "databaseconfig"
+                    }
+                  },
+                  {
+                    "configMapRef": {
+                      "name": "httpproxysettings"
+                    }
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "config-volume",
+                    "mountPath": "/app/build/config"
+                  }
+                ],
+                "command": [
+                  "serve"
+                ],
+                "args": [
+                  "-s",
+                  "-S",
+                  "build"
+                ]
+              }
+            ],
+            "volumes": [
+              {
+                "name": "config-volume",
+                "configMap": {
+                  "name": "gui-sign-config"
+                }
+              }
+            ]
+          }
+        },
+        "triggers": [
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "ImageChange",
+            "imageChangeParams": {
+              "automatic": true,
+              "containerNames": [
+                "guisign"
+              ],
+              "from": {
+                "kind": "ImageStreamTag",
+                "name": "guisign:latest"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "annotations": {
+          "description": "The Container Gui Sign"
+        },
+        "name": "guisign-svc"
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "guisign-web",
+            "port": 80,
+            "protocol": "TCP",
+            "targetPort": 5000
+          },
+          {
+            "name": "guisign-web-ssl",
+            "port": 443,
+            "protocol": "TCP",
+            "targetPort": 5000
+          }
+        ],
+        "selector": {
+          "deploymentconfig": "guisign"
+        }
+      }
+    },
+    {
+      "apiVersion": "route.openshift.io/v1",
+      "kind": "Route",
+      "metadata": {
+        "annotations": {
+          "description": "The route to expose the Gui Sign port"
+        },
+        "name": "guisign"
+      },
+      "spec": {
+        "host": "sign.local.test.belgium.be",
+        "port": {
+          "targetPort": "guisign-web-ssl"
+        },
+        "to": {
+          "kind": "Service",
+          "name": "guisign-svc"
+        },
+        "tls": {
+          "insecureEdgeTerminationPolicy": "Redirect",
+          "termination": "edge"
+        },
+        "wildcardPolicy": "None"
+      }
+    }
+  ]
+}
