@@ -10,13 +10,13 @@ objects:
   spec:
     lookupPolicy:
       local: true
-- apiVersion: v1
-  kind: ImageStream
-  metadata:
-    name: guiidp
-  spec:
-    lookupPolicy:
-      local: true
+#- apiVersion: v1
+#  kind: ImageStream
+#  metadata:
+#    name: guiidp
+#  spec:
+#    lookupPolicy:
+#      local: true
 - apiVersion: v1
   kind: ImageStream
   metadata:
@@ -24,13 +24,13 @@ objects:
   spec:
     lookupPolicy:
       local: true
-- apiVersion: v1
-  kind: ImageStream
-  metadata:
-    name: idp
-  spec:
-    lookupPolicy:
-      local: true
+#- apiVersion: v1
+#  kind: ImageStream
+#  metadata:
+#    name: idp
+#  spec:
+#    lookupPolicy:
+#      local: true
 - apiVersion: v1
   kind: ImageStream
   metadata:
@@ -66,13 +66,13 @@ objects:
   spec:
     lookupPolicy:
       local: true
-- apiVersion: v1
-  kind: ImageStream
-  metadata:
-    name: mvn-idp
-  spec:
-    lookupPolicy:
-      local: true
+#- apiVersion: v1
+#  kind: ImageStream
+#  metadata:
+#    name: mvn-idp
+#  spec:
+#    lookupPolicy:
+#      local: true
 - apiVersion: v1
   kind: ImageStream
   metadata:
@@ -157,19 +157,19 @@ objects:
         from:
           kind: ImageStreamTag
           name: mvn-dockers:latest
-- apiVersion: v1
-  kind: BuildConfig
-  metadata:
-    name: guiidp
-  spec:
-    source:
-      binary: {}
-    strategy:
-      dockerStrategy: {}
-    output:
-      to:
-        kind: ImageStreamTag
-        name: guiidp:latest
+#- apiVersion: v1
+#  kind: BuildConfig
+#  metadata:
+#    name: guiidp
+#  spec:
+#    source:
+#      binary: {}
+#    strategy:
+#      dockerStrategy: {}
+#    output:
+#      to:
+#        kind: ImageStreamTag
+#        name: guiidp:latest
 - apiVersion: v1
   kind: BuildConfig
   metadata:
@@ -183,87 +183,87 @@ objects:
       to:
         kind: ImageStreamTag
         name: guisign:latest
-- apiVersion: v1
-  kind: BuildConfig
-  metadata:
-    name: mvn-idp
-  spec:
-    source:
-      binary: {}
-      dockerfile: |
-        FROM maven:3-jdk-8
-        COPY . /build
-        RUN cd /build; mvn -DskipTests package
-    strategy:
-      dockerStrategy:
-        from:
-          kind: DockerImage
-          name: "maven:3-jdk-8"
-    output:
-      to:
-        kind: ImageStreamTag
-        name: mvn-idp:latest
-    triggers:
-    - type: ConfigChange
-- apiVersion: v1
-  kind: BuildConfig
-  metadata:
-    name: idp
-  spec:
-    source:
-      images:
-      - from:
-          kind: ImageStreamTag
-          name: mvn-idp:latest
-        paths:
-        - destinationDir: IDP-ws/target
-          sourcePath: /build/IDP-ws/target/IDP-ws-0.0.1-SNAPSHOT.war
-      - from:
-          kind: ImageStreamTag
-          name: mvn-dockers:latest
-        paths:
-        - destinationDir: .
-          sourcePath: /build/IDP/Dockerfile
-    strategy:
-      dockerStrategy:
-        from:
-          kind: ImageStreamTag
-          name: tomcat-oraclejdk:latest
-    output:
-      to:
-        kind: ImageStreamTag
-        name: idp:latest
-    triggers:
-    - type: ConfigChange
-    - type: ImageChange
-      imageChange:
-        from:
-          kind: ImageStreamTag
-          name: mvn-idp:latest
-    - type: ImageChange
-      imageChange:
-        from:
-          kind: ImageStreamTag
-          name: tomcat-oraclejdk:latest
-    - type: ImageChange
-      imageChange:
-        from:
-          kind: ImageStreamTag
-          name: mvn-dockers:latest
-- apiVersion: v1
-  kind: BuildConfig
-  metadata:
-    name: tomcat-oraclejdk
-  spec:
-    source:
-      binary: {}
-      contextDir: oracle-jdk-dockerfile
-    strategy:
-      dockerStrategy: {}
-    output:
-      to:
-        kind: ImageStreamTag
-        name: tomcat-oraclejdk:latest
+#- apiVersion: v1
+#  kind: BuildConfig
+#  metadata:
+#    name: mvn-idp
+#  spec:
+#    source:
+#      binary: {}
+#      dockerfile: |
+#        FROM maven:3-jdk-8
+#        COPY . /build
+#        RUN cd /build; mvn -DskipTests package
+#    strategy:
+#      dockerStrategy:
+#        from:
+#          kind: DockerImage
+#          name: "maven:3-jdk-8"
+#    output:
+#      to:
+#        kind: ImageStreamTag
+#        name: mvn-idp:latest
+#    triggers:
+#    - type: ConfigChange
+#- apiVersion: v1
+#  kind: BuildConfig
+#  metadata:
+#    name: idp
+#  spec:
+#    source:
+#      images:
+#      - from:
+#          kind: ImageStreamTag
+#          name: mvn-idp:latest
+#        paths:
+#        - destinationDir: IDP-ws/target
+#          sourcePath: /build/IDP-ws/target/IDP-ws-0.0.1-SNAPSHOT.war
+#      - from:
+#          kind: ImageStreamTag
+#          name: mvn-dockers:latest
+#        paths:
+#        - destinationDir: .
+#          sourcePath: /build/IDP/Dockerfile
+#    strategy:
+#      dockerStrategy:
+#        from:
+#          kind: ImageStreamTag
+#          name: tomcat-oraclejdk:latest
+#    output:
+#      to:
+#        kind: ImageStreamTag
+#        name: idp:latest
+#    triggers:
+#    - type: ConfigChange
+#    - type: ImageChange
+#      imageChange:
+#        from:
+#          kind: ImageStreamTag
+#          name: mvn-idp:latest
+#    - type: ImageChange
+#      imageChange:
+#        from:
+#          kind: ImageStreamTag
+#          name: tomcat-oraclejdk:latest
+#    - type: ImageChange
+#      imageChange:
+#        from:
+#          kind: ImageStreamTag
+#          name: mvn-dockers:latest
+#- apiVersion: v1
+#  kind: BuildConfig
+#  metadata:
+#    name: tomcat-oraclejdk
+#  spec:
+#    source:
+#      binary: {}
+#      contextDir: oracle-jdk-dockerfile
+#    strategy:
+#      dockerStrategy: {}
+#    output:
+#      to:
+#        kind: ImageStreamTag
+#        name: tomcat-oraclejdk:latest
 - apiVersion: v1
   kind: BuildConfig
   metadata:
