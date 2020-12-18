@@ -88,7 +88,7 @@ export PGPASSWORD=7l8XNiA3
 kill -TERM $PFW
 PFW=""
 oc create -f openshift/sign-validation.json
-oc create -f openshift/gui-sign.json
+oc create -f openshift/guisign.json
 oc create -f openshift/esealing.json
 status "Done; the project should now be loading into your openshift."
 echo "To access the services, edit /etc/hosts to point sign.local.test.belgium.be,"
