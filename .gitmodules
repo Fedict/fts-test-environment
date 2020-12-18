@@ -1,9 +1,9 @@
 [submodule "sign-validation"]
 	path = sign-validation
-	url = ../sign-validation.git
+	url = ../fts-sign-validation.git
 [submodule "GUI-sign"]
 	path = GUI-sign
-	url = ../GUI-sign.git
+	url = ../fts-gui-sign.git
 [submodule "esealing"]
 	path = esealing
-	url = ../esealing.git
+	url = ../fts-esealing.git
