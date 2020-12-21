@@ -76,8 +76,7 @@ For more questions, talk to Wouter.
 # Platform support
 
 `minishift` exists for Linux, Windows, and macOS. However, currently the
-script has only been tested on Linux.
-
-Since macOS is a Unix, it *should* work, although this has not yet been
-tested. For Windows, you'll need some form of a Unix shell; either
-WSL or something like cygwin might work. This, too, has not been tested.
+script has only been tested on Linux and macOS (after installing the
+needed commands, such as jq, using homebrew). On Windows, it *should*
+work after installing either Cygwin or WSL, but this has not yet been
+tested.
