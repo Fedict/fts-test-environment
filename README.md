@@ -15,7 +15,7 @@ HOWTO:
 - From this directory, run `./setup-testenv.sh`.
 - Edit your `/etc/hosts` (`C:\\Windows\\system32\\hosts.txt` on Windows)
   to redirect the services to the right IP address (as shown at the end
-  of `setup-environment.sh`, or which you can recall by way of
+  of `setup-testenv.sh`, or which you can recall by way of
   `minishift ip`.
 - Wait until all the images have been built (this depends on the speed
   of your Internet connection and your CPU...)
