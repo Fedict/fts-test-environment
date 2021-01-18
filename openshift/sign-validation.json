@@ -77,17 +77,6 @@
                     }
                   }
                 ],
-                "livenessProbe": {
-                  "exec": {
-                    "command": [
-                      "cat",
-                      "/tmp/lotl.ready"
-                    ]
-                  },
-                  "periodSeconds": 60,
-                  "initialDelaySeconds": 300,
-                  "failureThreshold": 5
-                }
               }
             ]
           }
