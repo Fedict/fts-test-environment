@@ -73,6 +73,7 @@ sed -i -e 's,ta.fts.bosa.belgium.be,local.test.belgium.be,g' gui-config/config.j
 oc create configmap gui-sign-config --from-file=gui-config
 
 oc create -f postgres.yaml
+oc create -f minio.yaml
 oc create -f squid-whitelist.yaml
 oc process -f squid.yaml | oc create -f -
 while [ $(( $(oc get -o json statefulset/postgresql | jq .status.readyReplicas) + 0 )) -lt 1 ]
