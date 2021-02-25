@@ -93,8 +93,8 @@ oc create -f openshift/guisign.json
 oc create -f openshift/esealing.json
 status "Done; the project should now be loading into your openshift."
 echo "To access the services, edit /etc/hosts to point sign.local.test.belgium.be,"
-echo "validate.local.test.belgium.be, esealing.local.test.belgium.be,"
-echo "to" $(minishift ip)
+echo "validate.local.test.belgium.be, esealing.local.test.belgium.be, and"
+echo "minio.local.test.belgium.be to" $(minishift ip)
 echo "To move on:"
 echo "  * 'minishift console' opens the OpenShift console in your default browser"
 echo "    (log on with user name 'system' and password 'admin')"
