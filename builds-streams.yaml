@@ -81,6 +81,13 @@ objects:
     lookupPolicy:
       local: true
 - apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: mintest
+  spec:
+    lookupPolicy:
+      local: true
+- apiVersion: v1
   kind: BuildConfig
   metadata:
     name: mvn-dockers
@@ -339,3 +346,16 @@ objects:
       to:
         kind: ImageStreamTag
         name: squid:latest
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: mintest
+  spec:
+    source:
+      binary: {}
+    strategy:
+      dockerStrategy: {}
+    output:
+      to:
+        kind: ImageStreamTag
+        name: mintest:latest

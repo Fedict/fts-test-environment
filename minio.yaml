@@ -27,8 +27,7 @@ spec:
     spec:
       containers:
       - name: minio
-        image: minio/minio:latest
-        env:
+        image: minio/minio
         ports:
         - containerPort: 9000
           name: minio

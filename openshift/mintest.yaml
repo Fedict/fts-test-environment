@@ -1,0 +1,104 @@
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: mintest
+spec:
+  replicas: 1
+  selector:
+    deploymentconfig: mintest
+  strategy:
+    resources:
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 100%
+      maxUnavailable: 0%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        application: mintest
+        deploymentconfig: mintest
+    spec:
+      initContainers:
+      - image: debian:latest
+        name: wait
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", 'for i in `seq 1 300`; do sleep 1; if ping -c 1 minio; then exit 0; fi; done; exit 1']
+      - image: minio/mc:latest
+        name: setup
+        imagePullPolicy: IfNotPresent
+        entrypoint: /bin/bash
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/app-config/
+        command: ["sh", "-c", 'mc --config-dir /tmp alias set myminio http://minio:9000 minioadmin minioadmin;
+          mc --config-dir /tmp mb --ignore-existing myminio/mintest;
+          mc --config-dir /tmp admin policy add myminio mintest /etc/app-config/mintest.json;
+          mc --config-dir /tmp admin user add myminio mintest 12345678;
+          mc --config-dir /tmp admin policy set myminio mintest user=mintest']
+      volumes:
+      - name: config-volume
+        configMap:
+          name: minioconfig
+      containers:
+      - image: mintest:latest
+        imagePullPolicy: Always
+        name: mintest
+        port: 8000
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1024Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+  triggers:
+  - type: ConfigChange
+  - type: ImageChange
+    imageChangeParams:
+      automatic: true
+      containerNames: 
+      - mintest
+      from:
+        kind: ImageStreamTag
+        name: mintest:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    description: Test FOD
+  name: mintest-svc
+spec:
+  ports:
+  - name: mintest-web
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  - name: mintest-ssl
+    port: 443
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    deploymentconfig: mintest
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    description: The route to expose the ministry of Testing port
+  name: mintest
+spec:
+  host: mintest.local.test.belgium.be
+  port:
+    targetPort: mintest-ssl
+  to:
+    kind: Service
+    name: mintest-svc
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  wildcardPolicy: None

@@ -64,6 +64,7 @@ oc start-build --from-dir=$(pwd) squid
 oc start-build --from-dir=$(pwd)/esealing mvn-esealing
 oc start-build --from-dir=$(pwd)/GUI-sign guisign
 oc start-build --from-dir=$(pwd)/sign-validation mvn-signvalidation
+oc start-build --from-dir=$(pwd)/mintest mintest
 oc create -f configmaps.yaml
 
 # Create config maps for frontend code
@@ -71,6 +72,7 @@ rm -rf gui-config
 cp -a GUI-sign/public/config gui-config
 sed -i -e 's,ta.fts.bosa.belgium.be,local.test.belgium.be,g' gui-config/config.js
 oc create configmap gui-sign-config --from-file=gui-config
+oc create configmap minioconfig --from-file=mintest/mintest.json
 
 oc create -f postgres.yaml
 oc create -f minio.yaml
@@ -91,6 +93,7 @@ PFW=""
 oc create -f openshift/sign-validation.json
 oc create -f openshift/guisign.json
 oc create -f openshift/esealing.json
+oc create -f openshift/mintest.yaml
 status "Done; the project should now be loading into your openshift."
 echo "To access the services, edit /etc/hosts to point sign.local.test.belgium.be,"
 echo "validate.local.test.belgium.be, esealing.local.test.belgium.be, and"
@@ -105,6 +108,7 @@ echo "  * For rebuilding/updating images:"
 echo "    * esealing: 'oc start-build --from-dir=./esealing -F mvn-esealing'"
 echo "    * Signing GUI: 'oc start-build --from-dir=./GUI-sign -F guisign'"
 echo "    * Sign/validation backend: 'oc start-build --from-dir=./sign-validation -F mvn-signvalidation'"
+echo "    * Federal Service of Testing Purposes: 'oc start-build --from-dir=./mintest mintest'"
 echo "    Note that a rebuild automatically triggers a restart of the (new) image"
 echo "  * 'oc get pods' lists the currently-running pods"
 echo "  * 'oc port-forward <pod name> <local port number>:<remote port number>'"
