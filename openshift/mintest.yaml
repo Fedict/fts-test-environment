@@ -36,7 +36,7 @@ spec:
           mountPath: /etc/app-config/
         command: ["sh", "-c", 'mc --config-dir /tmp alias set myminio http://minio:9000 minioadmin minioadmin;
           mc --config-dir /tmp mb --ignore-existing myminio/mintest;
-          mc --config-dir /tmp mb --ignore-existing minio/secrets;
+          mc --config-dir /tmp mb --ignore-existing myminio/secrets;
           mc --config-dir /tmp admin policy add myminio mintest /etc/app-config/mintest.json;
           mc --config-dir /tmp admin user add myminio mintest 12345678;
           mc --config-dir /tmp admin policy set myminio mintest user=mintest']
