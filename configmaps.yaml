@@ -33,6 +33,7 @@ data:
   S3ENDPOINT: http://minio:9000/
   S3ACCESSKEY: minioadmin
   S3SECRETKEY: minioadmin
+  S3SECRETBUCKET: secrets
 kind: ConfigMap
 metadata:
   name: signvalidationsettings
