@@ -314,6 +314,8 @@ objects:
         paths:
         - destinationDir: ./
           sourcePath: /build/sign-validation/Dockerfile
+        - destinationDir: ./
+          sourcePath: /build/sign-validation/parameters
     strategy:
       dockerStrategy: {}
     output:
