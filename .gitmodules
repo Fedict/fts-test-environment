@@ -7,3 +7,6 @@
 [submodule "esealing"]
 	path = esealing
 	url = ../fts-esealing.git
+[submodule "mintest"]
+	path = mintest
+	url = ../fts-mintest
